@@ -1,6 +1,3 @@
-require 'active_support/concern'
-require 'active_support/core_ext/module/delegation'
-
 # Public: Mixin that adds Queryable functionality to a plain ruby object.
 # A Queryable manages an internal query object, and defines chainable methods
 # that interact with the query object, modifying its value.
@@ -14,13 +11,18 @@ require 'active_support/core_ext/module/delegation'
 #   end
 #
 module Queryable
-  extend ActiveSupport::Concern
 
-  included do
-    # Public: Gets/Sets the internal query.
-    attr_accessor :query
+  # Internal: Adds class methods, a query accessor, and method delegation.
+  def self.included(base)
+    base.extend ClassMethods
+    base.extend Forwardable
+    base.class_eval do
 
-    delegate *delegated_methods, to: :query
+      # Public: Gets/Sets the internal query.
+      attr_accessor :query
+
+      def_delegators :query, *delegated_methods
+    end
   end
 
   # Public: Initialize a Queryable with a query.

@@ -221,14 +221,14 @@ overriden to add or remove methods to delegate.</p>
       <pre class="lines">
 
 
-107
-108
 109
 110
-111</pre>
+111
+112
+113</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/queryable.rb', line 107</span>
+      <pre class="code"><span class="info file"># File 'lib/queryable.rb', line 109</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_delegated_methods'>delegated_methods</span>
   <span class='const'>Array</span><span class='period'>.</span><span class='id identifier rubyid_instance_methods'>instance_methods</span> <span class='op'>-</span> <span class='const'>Object</span><span class='period'>.</span><span class='id identifier rubyid_instance_methods'>instance_methods</span> <span class='op'>+</span>
@@ -356,15 +356,15 @@ query.</p>
       <pre class="lines">
 
 
-96
-97
 98
 99
 100
-101</pre>
+101
+102
+103</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/queryable.rb', line 96</span>
+      <pre class="code"><span class="info file"># File 'lib/queryable.rb', line 98</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_scope'>scope</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_proc'>proc</span><span class='op'>=</span><span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_define_method'>define_method</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='op'>|</span>
@@ -382,7 +382,7 @@ query.</p>
 </div>
 
     <div id="footer">
-  Generated on Sat Apr 12 04:01:40 2014 by
+  Generated on Sat Apr 12 04:52:37 2014 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.7.4 (ruby-2.1.1).
 </div>

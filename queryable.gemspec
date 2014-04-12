@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = "queryable"
-  s.version = '1.0.0'
+  s.version = '1.0.1'
   s.licenses = ['MIT']
   s.summary = "Keep your scopes and queries flexible by using Ruby"
   s.description = "Queryable is a module that encapsulates query building so you don't have to tuck scopes inside your models."
@@ -15,6 +15,4 @@ Gem::Specification.new do |s|
   s.required_ruby_version = '>=1.9.3'
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
-
-  s.add_runtime_dependency 'activesupport'
 end

@@ -1,5 +1,4 @@
 require 'rspec/given'
-require 'pry'
 
 def stub_module(full_name, &block)
   stub_class_or_module(full_name, Module)
