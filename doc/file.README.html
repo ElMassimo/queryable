@@ -1,0 +1,185 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>
+  File: README
+  
+    &mdash; Documentation by YARD 0.8.7.4
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  hasFrames = window.top.frames.main ? true : false;
+  relpath = '';
+  framesUrl = "frames.html#!file.README.html";
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="header">
+      <div id="menu">
+  
+    <a href="_index.html">Index</a> &raquo; 
+    <span class="title">File: README</span>
+  
+
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+      Class List
+    </a>
+  
+    <a class="full_list_link" id="method_list_link"
+        href="method_list.html">
+      Method List
+    </a>
+  
+    <a class="full_list_link" id="file_list_link"
+        href="file_list.html">
+      File List
+    </a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+
+    <iframe id="search_frame"></iframe>
+
+    <div id="content"><div id='filecontents'>
+<h1 id="label-Queryable">Queryable</h1>
+
+<p><a href="http://badge.fury.io/rb/queryable"><img
+src="https://badge.fury.io/rb/queryable.svg"></a> <a
+href="https://travis-ci.org/ElMassimo/queryable"><img
+src="https://travis-ci.org/ElMassimo/queryable.svg"></a> <a
+href="https://coveralls.io/r/ElMassimo/queryable"><img
+src="https://coveralls.io/repos/ElMassimo/queryable/badge.png"></a> <a
+href="https://codeclimate.com/github/ElMassimo/queryable"><img
+src="https://codeclimate.com/github/ElMassimo/queryable.png"></a></p>
+
+<p>Queryable is a mixin that allows you to easily define query objects with
+chainable scopes.</p>
+
+<h2 id="label-Usage">Usage</h2>
+
+<pre class="code ruby"><code class="ruby">class CustomerQuery
+  include Queryable
+
+  scope(:recent) { desc(:logged_in_at) }
+
+  scope :active, -&gt;{ where(status: &#39;active&#39;) }
+
+  scope :favourite_brand do |product, brand|
+    where(&quot;favourites.#{product}&quot;: brand)
+  end
+
+  def current
+    recent.active
+  end
+
+  def miller_fans
+    favourite_brand(:beer, :Miller)
+  end
+
+  def search_in_current(field_values)
+    define_query do |customers|
+      field_values.inject(customers) { |customers, (field, value)|
+        customers.where(field =&gt; /#{value}/i)
+      }
+    end.current
+  end
+end
+
+
+CustomerQuery.new(shop.customers).miller_fans.search_in_current(last_name: &#39;M&#39;)
+</code></pre>
+
+<h3 id="label-Scopes">Scopes</h3>
+
+<p>Scopes serve to encapsulate reusable business rules, a method is defined
+with the selected name and block (or proc)</p>
+
+<h3 id="label-Define+Query">Define Query</h3>
+
+<p>While scopes are great because of their terseness, they can be limiting
+because the block executes in the context of the internal query, so
+methods, constants, and variables of the Queryable are not accessible.</p>
+
+<p>For those cases, you can use <code>define_query</code>, which is a
+convenience setter for the internal query, that also takes care of
+returning <code>self</code> at the end of the call to make the methods
+chainable.</p>
+
+<h2 id="label-Advantages">Advantages</h2>
+<ul><li>
+<p>Query objects are easy to understand.</p>
+</li><li>
+<p>You can inherit, mixin, and chain queries in a very natural way.</p>
+</li><li>
+<p>Increased testability, pretty close to being ORM/ODM agnostic.</p>
+</li></ul>
+
+<h2 id="label-Testing">Testing</h2>
+
+<p>You can check the <a
+href="http://github.com/ElMassimo/queryable/spec">specs</a> of the project
+to check how to test query objects without even having to require the
+ORM/ODM, or you can test by requiring your ORM/ODM and executing queries as
+usual.</p>
+
+<h2 id="label-RDocs">RDocs</h2>
+
+<p>You can view the <strong>Queryable</strong> documentation in RDoc format
+here:</p>
+
+<p><a
+href="http://rubydoc.info/github/ElMassimo/queryable/docs">rubydoc.info/github/ElMassimo/queryable/docs</a></p>
+
+<h2 id="label-License">License</h2>
+
+<pre class="code ruby"><code class="ruby">Copyright (c) 2014 Máximo Mussini
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+&quot;Software&quot;), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</code></pre>
+</div></div>
+
+    <div id="footer">
+  Generated on Sat Apr 12 04:01:40 2014 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.8.7.4 (ruby-2.1.1).
+</div>
+
+  </body>
+</html>
