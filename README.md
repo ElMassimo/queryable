@@ -61,6 +61,16 @@ For those cases, you can use a normal method, and then `scope` it. Queryable
 will take care of setting the return value of the method as the internal query,
 and return `self` at the end to make the method chainable.
 
+### Delegation
+
+By default most Array methods are delegated to the internal query. It's possible
+to delegate extra methods to the query by calling `delegate`.
+```ruby
+def CustomersQuery
+  delegate :update_all, :destroy_all
+end
+```
+
 ## Optional Modules
 
 ### DefaultQuery
