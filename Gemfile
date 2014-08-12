@@ -6,6 +6,7 @@ gem 'rake'
 gem 'bundler'
 
 group :test do
+  gem 'pry'
   gem 'rspec-given'
 end
 
