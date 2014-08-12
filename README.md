@@ -10,7 +10,7 @@ Queryable is a mixin that allows you to easily define query objects with chainab
 
 ## Usage
 ```ruby
-class CustomerQuery
+class CustomersQuery
   include Queryable
 
   scope(:recent) { desc(:logged_in_at) }
@@ -29,13 +29,17 @@ class CustomerQuery
     favourite_brand(:beer, :Miller)
   end
 
-  def search_in_current(field_values)
-    define_query do |customers|
-      field_values.inject(customers) { |customers, (field, value)|
-        customers.where(field => /#{value}/i)
-      }
-    end.current
+  scope def search(field_values)
+    field_values.inject(customers) { |customers, (field, value)|
+      customers.where(field => /#{value}/i)
+    }
   end
+
+  def search_in_current(field_values)
+    search(field_values).current
+  end
+
+  scope :search_in_current
 end
 
 
@@ -47,15 +51,60 @@ CustomerQuery.new(shop.customers).miller_fans.search_in_current(last_name: 'M')
 Scopes serve to encapsulate reusable business rules, a method is defined with
 the selected name and block (or proc)
 
-### Define Query
+### Scopeable Methods
 
 While scopes are great because of their terseness, they can be limiting because
 the block executes in the context of the internal query, so methods, constants,
 and variables of the Queryable are not accessible.
 
-For those cases, you can use `define_query`, which is a convenience setter for
-the internal query, that also takes care of returning `self` at the end of the
-call to make the methods chainable.
+For those cases, you can use a normal method, and then `scope` it. Queryable
+will take care of setting the return value of the method as the internal query,
+and return `self` at the end to make the method chainable.
+
+## Optional Modules
+
+### DefaultQuery
+Provides default initialization for query objects, by attempting to infer the
+class name of the default collection for the query, and it also provides a
+`queryable` method to specify it.
+
+```ruby
+def CustomersQuery
+  include Queryable
+  include Queryable::DefaultQuery
+end
+
+def OldCustomersQuery < CustomersQuery
+  queryable ArchivedCustomers
+end
+
+CustomersQuery.new.query == Customer.all
+OldCustomersQuery.new.query == ArchivedCustomers.all
+```
+### DefaultScope
+Allows to define default scopes in query objects, and inherit them in query
+object subclasses.
+
+```ruby
+def CustomersQuery
+  include Queryable
+  include Queryable::DefaultScope
+  include Queryable::DefaultQuery
+
+  default_scope :active
+  scope :active, -> { where(:last_purchase.gt => 7.days.ago) }
+end
+
+def BigCustomersQuery < CustomersQuery
+  default_scope :big_spender
+  scope :big_spender, -> { where(:total_expense.gt => 9999999) }
+end
+
+CustomersQuery.new.query == Customer.where(:last_purchase.gt => 7.days.ago)
+
+BigCustomersQuery.new.query ==
+Customer.where(:last_purchase.gt => 7.days.ago, :total_expense.gt => 9999999)
+```
 
 ## Advantages
 
