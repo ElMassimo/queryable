@@ -8,6 +8,31 @@ Queryable
 
 Queryable is a mixin that allows you to easily define query objects with chainable scopes.
 
+### Scopes
+
+Scopes serve to encapsulate reusable business rules, a method is defined with
+the selected name and block (or proc)
+
+### Scopeable Methods
+
+While scopes are great because of their terseness, they can be limiting because
+the block executes in the context of the internal query, so methods, constants,
+and variables of the Queryable are not accessible.
+
+For those cases, you can use a normal method, and then `scope` it. Queryable
+will take care of setting the return value of the method as the internal query,
+and return `self` at the end to make the method chainable.
+
+### Delegation
+
+By default most Array methods are delegated to the internal query. It's possible
+to delegate extra methods to the query by calling `delegate`.
+```ruby
+def CustomersQuery
+  delegate :update_all, :destroy_all
+end
+```
+
 ## Usage
 ```ruby
 class CustomersQuery
@@ -44,31 +69,6 @@ end
 
 
 CustomerQuery.new(shop.customers).miller_fans.search_in_current(last_name: 'M')
-```
-
-### Scopes
-
-Scopes serve to encapsulate reusable business rules, a method is defined with
-the selected name and block (or proc)
-
-### Scopeable Methods
-
-While scopes are great because of their terseness, they can be limiting because
-the block executes in the context of the internal query, so methods, constants,
-and variables of the Queryable are not accessible.
-
-For those cases, you can use a normal method, and then `scope` it. Queryable
-will take care of setting the return value of the method as the internal query,
-and return `self` at the end to make the method chainable.
-
-### Delegation
-
-By default most Array methods are delegated to the internal query. It's possible
-to delegate extra methods to the query by calling `delegate`.
-```ruby
-def CustomersQuery
-  delegate :update_all, :destroy_all
-end
 ```
 
 ## Optional Modules
