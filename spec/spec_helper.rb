@@ -1,4 +1,5 @@
 require 'rspec/given'
+require 'pry'
 
 def stub_module(full_name, &block)
   stub_class_or_module(full_name, Module)
@@ -33,5 +34,5 @@ def stub_class_or_module(full_name, kind, &block)
 end
 
 RSpec.configure do |config|
-  config.color_enabled = true
+  config.color = true
 end

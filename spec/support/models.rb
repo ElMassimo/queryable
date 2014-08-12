@@ -20,3 +20,10 @@ class Owner
     MockQuery.new
   end
 end
+
+class Other
+
+  def all
+    MockQuery.new
+  end
+end
