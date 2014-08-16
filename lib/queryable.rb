@@ -10,6 +10,9 @@
 #     scope(:too_damn_high) { where(:level.gt => 9000) }
 #   end
 #'
+require 'queryable/default_scope'
+require 'queryable/default_query'
+
 module Queryable
 
   # Internal: Adds class methods, a query accessor, and method delegation.
