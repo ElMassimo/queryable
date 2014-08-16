@@ -73,6 +73,9 @@ CustomerQuery.new(shop.customers).miller_fans.search_in_current(last_name: 'M')
 ```
 
 ## Optional Modules
+Besides Queryable, there are two opt-in modules that can help you when creating
+query objects. These modules would need to be manually required during app
+initialization or wherever necessary (in Rails, config/initializers).
 
 ### DefaultQuery
 Provides default initialization for query objects, by attempting to infer the
@@ -80,6 +83,8 @@ class name of the default collection for the query, and it also provides a
 `queryable` method to specify it.
 
 ```ruby
+require 'queryable/default_query'
+
 def CustomersQuery
   include Queryable
   include Queryable::DefaultQuery
@@ -97,6 +102,8 @@ Allows to define default scopes in query objects, and inherit them in query
 object subclasses.
 
 ```ruby
+require 'queryable/default_scope'
+
 def CustomersQuery
   include Queryable
   include Queryable::DefaultScope
@@ -115,6 +122,27 @@ CustomersQuery.new.query == Customer.where(:last_purchase.gt => 7.days.ago)
 
 BigCustomersQuery.new.query ==
 Customer.where(:last_purchase.gt => 7.days.ago, :total_expense.gt => 9999999)
+```
+
+### Notes
+To avoid repetition, it's a good idea to create a `BaseQuery` object
+to contain both the modules inclusion, and common scopes you may reuse.
+
+```ruby
+require 'queryable/default_query'
+require 'queryable/default_scope'
+
+def BaseQuery
+  include Queryable
+  include Queryable::DefaultScope
+  include Queryable::DefaultQuery
+  
+  scope :recent, ->{ where(:created_at.gt => 1.week.ago) }
+end
+
+def CustomersQuery < BaseQuery
+...
+end
 ```
 
 ## Advantages
