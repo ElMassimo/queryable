@@ -3,6 +3,8 @@ require 'support/models'
 class BaseDefaultQuery
   include Queryable
   include Queryable::DefaultQuery
+
+  queryable false
 end
 
 class NotOwnersQuery < BaseDefaultQuery

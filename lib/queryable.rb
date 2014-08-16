@@ -18,7 +18,8 @@ module Queryable
     base.extend ClassMethods
     base.class_eval do
       # Public: Gets/Sets the internal query.
-      attr_accessor :query
+      attr_accessor :queryable
+      alias_method :query, :queryable
 
       # Internal: Delegates Array and Criteria methods to the internal query.
       delegate *Queryable.default_delegated_methods
@@ -29,7 +30,7 @@ module Queryable
   #
   # query - The internal query to build upon.
   def initialize(query)
-    @query = query.all
+    @queryable = query.all
   end
 
   # Internal: Contains the Queryable class methods.
@@ -37,7 +38,7 @@ module Queryable
 
     # Public: Delegates the specified methods to the internal query.
     def delegate(*methods)
-      methods.last.is_a?(Hash) ? super : def_delegators(:query, *methods)
+      methods.last.is_a?(Hash) ? super : def_delegators(:queryable, *methods)
     end
 
     # Public: Defines a new scope method, or makes an existing method chainable.
@@ -83,7 +84,7 @@ module Queryable
     # the context of the internal query object, and returns self.
     def define_scope(name, proc)
       define_method(name) do |*args|
-        @query = query.instance_exec *args, &proc
+        @queryable = queryable.instance_exec *args, &proc
         self
       end
     end
@@ -103,7 +104,7 @@ module Queryable
   def self.scope_method(name)
     <<-SCOPE
       def #{name}(*args)
-        @query = super
+        @queryable = super
         self
       end
     SCOPE

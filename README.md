@@ -72,6 +72,18 @@ end
 CustomerQuery.new(shop.customers).miller_fans.search_in_current(last_name: 'M')
 ```
 
+## Advantages
+
+* Query objects are easy to understand.
+* You can inherit, mixin, and chain queries in a very natural way.
+* Increased testability, pretty close to being ORM/ODM agnostic.
+
+## Testing
+
+You can check the [specs](https://github.com/ElMassimo/queryable/tree/master/spec) of the project
+to check how to test query objects without even having to require the ORM/ODM, or
+you can test by requiring your ORM/ODM and executing queries as usual.
+
 ## Optional Modules
 Besides Queryable, there are two opt-in modules that can help you when creating
 query objects. These modules would need to be manually required during app
@@ -94,9 +106,25 @@ def OldCustomersQuery < CustomersQuery
   queryable ArchivedCustomers
 end
 
-CustomersQuery.new.query == Customer.all
-OldCustomersQuery.new.query == ArchivedCustomers.all
+CustomersQuery.new.queryable == Customer.all
+OldCustomersQuery.new.queryable == ArchivedCustomers.all
 ```
+If you want to use common base objects for your queries, you may want want to
+delay the automatic inference:
+```ruby
+class BaseQuery
+  include Queryable
+  include Queryable::DefaultQuery
+
+  queryable false
+end
+
+class CustomersQuery < BaseQuery
+end
+
+CustomersQuery.new.queryable == Customer.all
+```
+
 ### DefaultScope
 Allows to define default scopes in query objects, and inherit them in query
 object subclasses.
@@ -118,9 +146,9 @@ def BigCustomersQuery < CustomersQuery
   scope :big_spender, -> { where(:total_expense.gt => 9999999) }
 end
 
-CustomersQuery.new.query == Customer.where(:last_purchase.gt => 7.days.ago)
+CustomersQuery.new.queryable == Customer.where(:last_purchase.gt => 7.days.ago)
 
-BigCustomersQuery.new.query ==
+BigCustomersQuery.new.queryable ==
 Customer.where(:last_purchase.gt => 7.days.ago, :total_expense.gt => 9999999)
 ```
 
@@ -136,7 +164,9 @@ def BaseQuery
   include Queryable
   include Queryable::DefaultScope
   include Queryable::DefaultQuery
-  
+
+  queryable false
+
   scope :recent, ->{ where(:created_at.gt => 1.week.ago) }
 end
 
@@ -144,18 +174,6 @@ def CustomersQuery < BaseQuery
 ...
 end
 ```
-
-## Advantages
-
-* Query objects are easy to understand.
-* You can inherit, mixin, and chain queries in a very natural way.
-* Increased testability, pretty close to being ORM/ODM agnostic.
-
-## Testing
-
-You can check the [specs](https://github.com/ElMassimo/queryable/tree/master/spec) of the project
-to check how to test query objects without even having to require the ORM/ODM, or
-you can test by requiring your ORM/ODM and executing queries as usual.
 
 ## RDocs
 

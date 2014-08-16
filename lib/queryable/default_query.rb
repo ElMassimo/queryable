@@ -28,12 +28,14 @@ module Queryable
         queryable_class.all
       end
 
-      # Internal: The default table or collection for this query object.
-      # Provides a default based on a convention of the query object name.
+      # Internal: Attempts to use the parent query collection (if any), and
+      # provides a default based on a convention of the query object name.
       def queryable_class
-        @queryable_class ||= if superclass.respond_to?(:queryable_class)
+        unless defined?(@queryable_class)
+          @queryable_class = superclass.respond_to?(:queryable_class) &&
           superclass.queryable_class || Object.const_get(name.gsub('sQuery', ''))
         end
+        @queryable_class
       end
     end
   end
