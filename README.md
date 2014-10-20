@@ -13,18 +13,6 @@ Queryable is a mixin that allows you to easily define query objects with chainab
 
 Scopes serve to encapsulate reusable business rules, a method is defined with
 the selected name and block (or proc)
-
-### Delegation
-
-By default most Array methods are delegated to the internal query. It's possible
-to delegate extra methods to the query by calling `delegate`.
-```ruby
-def CustomersQuery
-  delegate :update_all, :destroy_all
-end
-```
-
-## Usage
 ```ruby
 class CustomersQuery
   include Queryable
@@ -50,22 +38,26 @@ end
 CustomerQuery.new(shop.customers).miller_fans
 ```
 
+### Delegation
+
+By default most Array methods are delegated to the internal query. It's possible
+to delegate extra methods to the query by calling `delegate`.
+```ruby
+def CustomersQuery
+  delegate :update_all, :destroy_all
+end
+```
+
 ## Advantages
 
 * Query objects are easy to understand.
 * You can inherit, mixin, and chain queries in a very natural way.
 * Increased testability, pretty close to being ORM/ODM agnostic.
 
-## Testing
-
-You can check the [specs](https://github.com/ElMassimo/queryable/tree/master/spec) of the project
-to check how to test query objects without even having to require the ORM/ODM, or
-you can test by requiring your ORM/ODM and executing queries as usual.
-
 ## Optional Modules
-Besides Queryable, there are three opt-in modules that can help you when creating
-query objects. These modules would need to be manually required during app
-initialization or wherever necessary (in Rails, config/initializers).
+There are three opt-in modules that can help you when creating query objects.
+These modules would need to be manually required during app initialization or
+wherever necessary (in Rails, config/initializers).
 
 ### DefaultQuery
 Provides default initialization for query objects, by attempting to infer the
@@ -130,7 +122,7 @@ BigCustomersQuery.new.queryable ==
 Customer.where(:last_purchase.gt => 7.days.ago, :total_expense.gt => 9999999)
 ```
 
-### Chainable Methods
+### Chainable
 
 While scopes are great because of their terseness, they can be limiting because
 the block executes in the context of the internal query, so methods, constants,
@@ -197,6 +189,12 @@ def CustomersQuery < BaseQuery
 ...
 end
 ```
+
+## Testing
+
+You can check the [specs](https://github.com/ElMassimo/queryable/tree/master/spec) of the project
+to check how to test query objects without even having to require the ORM/ODM, or
+you can test by requiring your ORM/ODM and executing queries as usual.
 
 ## RDocs
 
