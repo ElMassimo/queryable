@@ -43,17 +43,17 @@ class OwnerQuery
   end
 
   # Just to illustrate case where you need access to one the Queryable object's methods
-  scope def greedy
-    query.with_size(shops: many)
+  def greedy
+    queryable.with_size(shops: many)
   end
 
   # Simpler query but we don't want to make a scope for `order(:name)`
-  scope def successful
+  def successful
     success_over(9000).order(:name)
   end
 
   # Complex query that we don't want to define with a scope (we could by injecting self)
-  scope def search(field_values)
+  def search(field_values)
     field_values.inject(query) { |user, (field, value)|
       user.where(field => /#{value}/i)
     }

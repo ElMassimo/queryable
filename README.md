@@ -14,16 +14,6 @@ Queryable is a mixin that allows you to easily define query objects with chainab
 Scopes serve to encapsulate reusable business rules, a method is defined with
 the selected name and block (or proc)
 
-### Scopeable Methods
-
-While scopes are great because of their terseness, they can be limiting because
-the block executes in the context of the internal query, so methods, constants,
-and variables of the Queryable are not accessible.
-
-For those cases, you can use a normal method, and then `scope` it. Queryable
-will take care of setting the return value of the method as the internal query,
-and return `self` at the end to make the method chainable.
-
 ### Delegation
 
 By default most Array methods are delegated to the internal query. It's possible
@@ -54,22 +44,10 @@ class CustomersQuery
   def miller_fans
     favourite_brand(:beer, :Miller)
   end
-
-  scope def search(field_values)
-    field_values.inject(customers) { |customers, (field, value)|
-      customers.where(field => /#{value}/i)
-    }
-  end
-
-  def search_in_current(field_values)
-    search(field_values).current
-  end
-
-  scope :search_in_current
 end
 
 
-CustomerQuery.new(shop.customers).miller_fans.search_in_current(last_name: 'M')
+CustomerQuery.new(shop.customers).miller_fans
 ```
 
 ## Advantages
@@ -85,7 +63,7 @@ to check how to test query objects without even having to require the ORM/ODM, o
 you can test by requiring your ORM/ODM and executing queries as usual.
 
 ## Optional Modules
-Besides Queryable, there are two opt-in modules that can help you when creating
+Besides Queryable, there are three opt-in modules that can help you when creating
 query objects. These modules would need to be manually required during app
 initialization or wherever necessary (in Rails, config/initializers).
 
@@ -152,18 +130,63 @@ BigCustomersQuery.new.queryable ==
 Customer.where(:last_purchase.gt => 7.days.ago, :total_expense.gt => 9999999)
 ```
 
+### Chainable Methods
+
+While scopes are great because of their terseness, they can be limiting because
+the block executes in the context of the internal query, so methods, constants,
+and variables of the Queryable are not accessible.
+
+For those cases, you can use a normal method, and then `chain` it. Chainable
+will take care of setting the return value of the method as the internal query,
+and return `self` at the end to make the method chainable.
+
+```ruby
+class CustomersQuery
+  include Queryable
+  include Queryable::Chainable
+
+  chain :active, :recent
+
+  def active
+    where(status: 'active')
+  end
+
+  def recent
+    queryable.desc(:logged_in_at)
+  end
+
+  chain def search(field_values)
+    field_values.inject(queryable) { |query, (field, value)|
+      query.where(field => /#{value}/i)
+    }
+  end
+
+  def search_in_active(field_values)
+    search(field_values).active
+  end
+end
+
+
+CustomerQuery.new(shop.customers).miller_fans.search_in_current(last_name: 'M')
+```
+
 ### Notes
 To avoid repetition, it's a good idea to create a `BaseQuery` object
 to contain both the modules inclusion, and common scopes you may reuse.
 
 ```ruby
-require 'queryable/default_query'
+require 'queryable/chainable'
 require 'queryable/default_scope'
+require 'queryable/default_query'
 
 def BaseQuery
   include Queryable
+  include Queryable::Chainable
   include Queryable::DefaultScope
   include Queryable::DefaultQuery
+
+  # If you want to be concise:
+  include Queryable::DefaultQuery, Queryable::DefaultScope, Queryable::Chainable, Queryable
 
   queryable false
 

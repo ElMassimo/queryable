@@ -1,8 +1,9 @@
 require 'spec_helper'
 require './lib/queryable'
-require 'support/queries'
+require './lib/queryable/chainable'
+require 'support/chainable_queries'
 
-describe 'Queryable::define_query' do
+describe 'Queryable::Chainable' do
   Given(:query) { MockQuery.new([*allows]) }
   Given(:queryable) { OwnerQuery.new(query) }
 
