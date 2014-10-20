@@ -82,6 +82,7 @@ OldCustomersQuery.new.queryable == ArchivedCustomers.all
 ```
 If you want to use common base objects for your queries, you may want want to
 delay the automatic inference:
+
 ```ruby
 class BaseQuery
   include Queryable
