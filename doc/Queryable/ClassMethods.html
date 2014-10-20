@@ -156,7 +156,8 @@
 
   
     <span class="summary_desc"><div class='inline'>
-<p>Defines a new scope method, or makes an existing method chainable.</p>
+<p>Defines a new method that executes the passed proc or block in the context
+of the internal query object, and returns self.</p>
 </div></span>
   
 </li>
@@ -197,15 +198,15 @@
       <pre class="lines">
 
 
-39
 40
-41</pre>
+41
+42</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/queryable.rb', line 39</span>
+      <pre class="code"><span class="info file"># File 'lib/queryable.rb', line 40</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_delegate'>delegate</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_methods'>methods</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_methods'>methods</span><span class='period'>.</span><span class='id identifier rubyid_last'>last</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='kw'>super</span> <span class='op'>:</span> <span class='id identifier rubyid_def_delegators'>def_delegators</span><span class='lparen'>(</span><span class='symbol'>:query</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_methods'>methods</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_methods'>methods</span><span class='period'>.</span><span class='id identifier rubyid_last'>last</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='kw'>super</span> <span class='op'>:</span> <span class='id identifier rubyid_def_delegators'>def_delegators</span><span class='lparen'>(</span><span class='symbol'>:queryable</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_methods'>methods</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -224,7 +225,8 @@
 </h3><div class="docstring">
   <div class="discussion">
     <p class="note returns_void">This method returns an undefined value.</p>
-<p>Defines a new scope method, or makes an existing method chainable.</p>
+<p>Defines a new method that executes the passed proc or block in the context
+of the internal query object, and returns self.</p>
 
 
   </div>
@@ -243,13 +245,6 @@
       
       <pre class="example code"><code><span class='id identifier rubyid_scope'>scope</span> <span class='symbol'>:of_brand</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_brand'>brand</span><span class='op'>|</span>
   <span class='id identifier rubyid_where'>where</span><span class='lparen'>(</span><span class='label'>_type:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_brand'>brand</span><span class='embexpr_end'>}</span><span class='tstring_content'>ExtremelyFastRacingCar</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
-<span class='kw'>end</span></code></pre>
-    
-      
-      <pre class="example code"><code><span class='id identifier rubyid_scope'>scope</span> <span class='kw'>def</span> <span class='id identifier rubyid_search'>search</span><span class='lparen'>(</span><span class='id identifier rubyid_field_values'>field_values</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_field_values'>field_values</span><span class='period'>.</span><span class='id identifier rubyid_inject'>inject</span><span class='lparen'>(</span><span class='id identifier rubyid_query'>query</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_query'>query</span><span class='comma'>,</span> <span class='lparen'>(</span><span class='id identifier rubyid_field'>field</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span><span class='op'>|</span>
-    <span class='id identifier rubyid_query'>query</span><span class='period'>.</span><span class='id identifier rubyid_where'>where</span><span class='lparen'>(</span><span class='id identifier rubyid_field'>field</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_value'>value</span><span class='embexpr_end'>}</span><span class='regexp_end'>/i</span></span><span class='rparen'>)</span>
-  <span class='rbrace'>}</span>
 <span class='kw'>end</span></code></pre>
     
   </div>
@@ -334,22 +329,20 @@ query.</p>
       <pre class="lines">
 
 
+68
+69
+70
+71
 72
-73
-74
-75
-76
-77
-78</pre>
+73</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/queryable.rb', line 72</span>
+      <pre class="code"><span class="info file"># File 'lib/queryable.rb', line 68</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_scope'>scope</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_proc'>proc</span><span class='op'>=</span><span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
-  <span class='kw'>if</span> <span class='id identifier rubyid_method_defined?'>method_defined?</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_scope_method'>scope_method</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
-  <span class='kw'>else</span>
-    <span class='id identifier rubyid_define_scope'>define_scope</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_proc'>proc</span> <span class='op'>||</span> <span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_define_method'>define_method</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='op'>|</span>
+    <span class='ivar'>@queryable</span> <span class='op'>=</span> <span class='id identifier rubyid_queryable'>queryable</span><span class='period'>.</span><span class='id identifier rubyid_instance_exec'>instance_exec</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='lparen'>(</span><span class='id identifier rubyid_proc'>proc</span> <span class='op'>||</span> <span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+    <span class='kw'>self</span>
   <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -362,7 +355,7 @@ query.</p>
 </div>
 
     <div id="footer">
-  Generated on Tue Aug 12 01:41:41 2014 by
+  Generated on Mon Oct 20 20:10:58 2014 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.7.4 (ruby-2.1.2).
 </div>

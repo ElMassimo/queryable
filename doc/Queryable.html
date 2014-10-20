@@ -80,7 +80,7 @@
   
     <dt class="r1 last">Defined in:</dt>
     <dd class="r1 last">lib/queryable.rb<span class="defines">,<br />
-  lib/queryable/default_scope.rb,<br /> lib/queryable/default_query.rb</span>
+  lib/queryable/chainable.rb,<br /> lib/queryable/default_query.rb,<br /> lib/queryable/default_scope.rb</span>
 </dd>
   
 </dl>
@@ -89,8 +89,8 @@
 <h2>Overview</h2><div class="docstring">
   <div class="discussion">
     
-<p>Provides default initialization for query objects, most objects are mapped
-to a collection or table, the default query takes all of them.</p>
+<p>Allows to define default scopes in query objects, and inherit them in query
+object subclasses.</p>
 
 
   </div>
@@ -102,7 +102,7 @@ to a collection or table, the default query takes all of them.</p>
 <p class="children">
   
     
-      <strong class="modules">Modules:</strong> <span class='object_link'><a href="Queryable/ClassMethods.html" title="Queryable::ClassMethods (module)">ClassMethods</a></span>, <span class='object_link'><a href="Queryable/DefaultQuery.html" title="Queryable::DefaultQuery (module)">DefaultQuery</a></span>, <span class='object_link'><a href="Queryable/DefaultScope.html" title="Queryable::DefaultScope (module)">DefaultScope</a></span>
+      <strong class="modules">Modules:</strong> <span class='object_link'><a href="Queryable/Chainable.html" title="Queryable::Chainable (module)">Chainable</a></span>, <span class='object_link'><a href="Queryable/ClassMethods.html" title="Queryable::ClassMethods (module)">ClassMethods</a></span>, <span class='object_link'><a href="Queryable/DefaultQuery.html" title="Queryable::DefaultQuery (module)">DefaultQuery</a></span>, <span class='object_link'><a href="Queryable/DefaultScope.html" title="Queryable::DefaultScope (module)">DefaultScope</a></span>
     
   
     
@@ -166,30 +166,6 @@ to a collection or table, the default query takes all of them.</p>
   
     <span class="summary_desc"><div class='inline'>
 <p>Adds class methods, a query accessor, and method delegation.</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#scope_method-class_method" title="scope_method (class method)">+ (Object) <strong>scope_method</strong>(name) </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  <span class="private note title">private</span>
-
-  
-    <span class="summary_desc"><div class='inline'>
-<p>Generates the scope interceptor method.</p>
 </div></span>
   
 </li>
@@ -285,14 +261,14 @@ to a collection or table, the default query takes all of them.</p>
       <pre class="lines">
 
 
-115
-116
-117
-118
-119</pre>
+79
+80
+81
+82
+83</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/queryable.rb', line 115</span>
+      <pre class="code"><span class="info file"># File 'lib/queryable.rb', line 79</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_default_delegated_methods'>default_delegated_methods</span>
   <span class='const'>Array</span><span class='period'>.</span><span class='id identifier rubyid_instance_methods'>instance_methods</span> <span class='op'>-</span> <span class='const'>Object</span><span class='period'>.</span><span class='id identifier rubyid_instance_methods'>instance_methods</span> <span class='op'>+</span>
@@ -344,7 +320,8 @@ to a collection or table, the default query takes all of them.</p>
 23
 24
 25
-26</pre>
+26
+27</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/queryable.rb', line 16</span>
@@ -354,105 +331,13 @@ to a collection or table, the default query takes all of them.</p>
   <span class='id identifier rubyid_base'>base</span><span class='period'>.</span><span class='id identifier rubyid_extend'>extend</span> <span class='const'>ClassMethods</span>
   <span class='id identifier rubyid_base'>base</span><span class='period'>.</span><span class='id identifier rubyid_class_eval'>class_eval</span> <span class='kw'>do</span>
     <span class='comment'># Public: Gets/Sets the internal query.
-</span>    <span class='id identifier rubyid_attr_accessor'>attr_accessor</span> <span class='symbol'>:query</span>
+</span>    <span class='id identifier rubyid_attr_accessor'>attr_accessor</span> <span class='symbol'>:queryable</span>
+    <span class='id identifier rubyid_alias_method'>alias_method</span> <span class='symbol'>:query</span><span class='comma'>,</span> <span class='symbol'>:queryable</span>
 
     <span class='comment'># Internal: Delegates Array and Criteria methods to the internal query.
 </span>    <span class='id identifier rubyid_delegate'>delegate</span> <span class='op'>*</span><span class='const'>Queryable</span><span class='period'>.</span><span class='id identifier rubyid_default_delegated_methods'>default_delegated_methods</span>
   <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="scope_method-class_method">
-  
-    + (<tt>Object</tt>) <strong>scope_method</strong>(name) 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p class="note private">
-  <strong>This method is part of a private API.</strong>
-  You should avoid using this method if possible, as it may be removed or be changed in the future.
-</p>
-
-<p>Generates the scope interceptor method.</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  <p class="tag_title">Parameters:</p>
-<ul class="param">
-  
-    <li>
-      
-        <span class='name'>name</span>
-      
-      
-        <span class='type'></span>
-      
-      
-      
-        &mdash;
-        <div class='inline'>
-<p>Name of the method to convert to a scope.</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-<p class="tag_title">Returns:</p>
-<ul class="return">
-  
-    <li>
-      
-      
-        <span class='type'></span>
-      
-      
-      
-        
-        <div class='inline'>
-<p>a String with the code of the scope method.</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-103
-104
-105
-106
-107
-108
-109
-110</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/queryable.rb', line 103</span>
-
-<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_scope_method'>scope_method</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
-  <span class='heredoc_beg'>&lt;&lt;-SCOPE</span>
-<span class='tstring_content'>    def </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>(*args)
-      @query = super
-      self
-    end
-</span><span class='heredoc_end'>  SCOPE
-</span><span class='kw'>end</span></pre>
     </td>
   </tr>
 </table>
@@ -510,15 +395,15 @@ to a collection or table, the default query takes all of them.</p>
       <pre class="lines">
 
 
-31
 32
-33</pre>
+33
+34</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/queryable.rb', line 31</span>
+      <pre class="code"><span class="info file"># File 'lib/queryable.rb', line 32</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_query'>query</span><span class='rparen'>)</span>
-  <span class='ivar'>@query</span> <span class='op'>=</span> <span class='id identifier rubyid_query'>query</span><span class='period'>.</span><span class='id identifier rubyid_all'>all</span>
+  <span class='ivar'>@queryable</span> <span class='op'>=</span> <span class='id identifier rubyid_query'>query</span><span class='period'>.</span><span class='id identifier rubyid_all'>all</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -530,7 +415,7 @@ to a collection or table, the default query takes all of them.</p>
 </div>
 
     <div id="footer">
-  Generated on Tue Aug 12 01:41:41 2014 by
+  Generated on Mon Oct 20 20:10:58 2014 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.7.4 (ruby-2.1.2).
 </div>

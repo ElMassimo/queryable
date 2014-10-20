@@ -68,16 +68,30 @@
 src="https://badge.fury.io/rb/queryable.svg"></a> <a
 href="https://travis-ci.org/ElMassimo/queryable"><img
 src="https://travis-ci.org/ElMassimo/queryable.svg"></a> <a
-href="https://coveralls.io/r/ElMassimo/queryable"><img
-src="https://coveralls.io/repos/ElMassimo/queryable/badge.png"></a> <a
+href="https://codeclimate.com/github/ElMassimo/queryable"><img
+src="https://codeclimate.com/github/ElMassimo/queryable.png"></a> <a
 href="http://inch-ci.org/github/ElMassimo/queryable"><img
-src="http://inch-ci.org/github/ElMassimo/queryable.svg"></a> &lt;!– [![Code
-Climate](<a
-href="https://codeclimate.com/github/ElMassimo/queryable.png)](https://codeclimate.com/github/ElMassimo/queryable">codeclimate.com/github/ElMassimo/queryable.png)](https://codeclimate.com/github/ElMassimo/queryable</a>)
+src="http://inch-ci.org/github/ElMassimo/queryable.svg"></a> <a
+href="https://github.com/ElMassimo/queryable/blob/master/LICENSE.txt"><img
+src="https://img.shields.io/badge/license-MIT-blue.svg"></a> &lt;!–
+[![Coverage Status](<a
+href="https://coveralls.io/repos/ElMassimo/queryable/badge.png)](https://coveralls.io/r/ElMassimo/queryable">coveralls.io/repos/ElMassimo/queryable/badge.png)](https://coveralls.io/r/ElMassimo/queryable</a>)
 –&gt;</p>
 
 <p>Queryable is a mixin that allows you to easily define query objects with
 chainable scopes.</p>
+
+<h3 id="label-Scopes">Scopes</h3>
+
+<p>Scopes serve to encapsulate reusable business rules, a method is defined
+with the selected name and block (or proc)</p>
+
+<h3 id="label-Delegation">Delegation</h3>
+
+<p>By default most Array methods are delegated to the internal query. It&#39;s
+possible to delegate extra methods to the query by calling
+<code>delegate</code>. <code>ruby def CustomersQuery   delegate
+:update_all, :destroy_all end </code></p>
 
 <h2 id="label-Usage">Usage</h2>
 
@@ -99,91 +113,10 @@ chainable scopes.</p>
   def miller_fans
     favourite_brand(:beer, :Miller)
   end
-
-  scope def search(field_values)
-    field_values.inject(customers) { |customers, (field, value)|
-      customers.where(field =&gt; /#{value}/i)
-    }
-  end
-
-  def search_in_current(field_values)
-    search(field_values).current
-  end
-
-  scope :search_in_current
 end
 
 
-CustomerQuery.new(shop.customers).miller_fans.search_in_current(last_name: &#39;M&#39;)
-</code></pre>
-
-<h3 id="label-Scopes">Scopes</h3>
-
-<p>Scopes serve to encapsulate reusable business rules, a method is defined
-with the selected name and block (or proc)</p>
-
-<h3 id="label-Scopeable+Methods">Scopeable Methods</h3>
-
-<p>While scopes are great because of their terseness, they can be limiting
-because the block executes in the context of the internal query, so
-methods, constants, and variables of the Queryable are not accessible.</p>
-
-<p>For those cases, you can use a normal method, and then <code>scope</code>
-it. Queryable will take care of setting the return value of the method as
-the internal query, and return <code>self</code> at the end to make the
-method chainable.</p>
-
-<h3 id="label-Delegation">Delegation</h3>
-
-<p>By default most Array methods are delegated to the internal query. It&#39;s
-possible to delegate extra methods to the query by calling
-<code>delegate</code>. <code>ruby def CustomersQuery   delegate
-:update_all, :destroy_all end </code></p>
-
-<h2 id="label-Optional+Modules">Optional Modules</h2>
-
-<h3 id="label-DefaultQuery">DefaultQuery</h3>
-
-<p>Provides default initialization for query objects, by attempting to infer
-the class name of the default collection for the query, and it also
-provides a <code>queryable</code> method to specify it.</p>
-
-<pre class="code ruby"><code class="ruby">def CustomersQuery
-  include Queryable
-  include Queryable::DefaultQuery
-end
-
-def OldCustomersQuery &lt; CustomersQuery
-  queryable ArchivedCustomers
-end
-
-CustomersQuery.new.query == Customer.all
-OldCustomersQuery.new.query == ArchivedCustomers.all
-</code></pre>
-
-<h3 id="label-DefaultScope">DefaultScope</h3>
-
-<p>Allows to define default scopes in query objects, and inherit them in query
-object subclasses.</p>
-
-<pre class="code ruby"><code class="ruby">def CustomersQuery
-  include Queryable
-  include Queryable::DefaultScope
-  include Queryable::DefaultQuery
-
-  default_scope :active
-  scope :active, -&gt; { where(:last_purchase.gt =&gt; 7.days.ago) }
-end
-
-def BigCustomersQuery &lt; CustomersQuery
-  default_scope :big_spender
-  scope :big_spender, -&gt; { where(:total_expense.gt =&gt; 9999999) }
-end
-
-CustomersQuery.new.query == Customer.where(:last_purchase.gt =&gt; 7.days.ago)
-
-BigCustomersQuery.new.query ==
-Customer.where(:last_purchase.gt =&gt; 7.days.ago, :total_expense.gt =&gt; 9999999)
+CustomerQuery.new(shop.customers).miller_fans
 </code></pre>
 
 <h2 id="label-Advantages">Advantages</h2>
@@ -202,6 +135,140 @@ href="https://github.com/ElMassimo/queryable/tree/master/spec">specs</a> of
 the project to check how to test query objects without even having to
 require the ORM/ODM, or you can test by requiring your ORM/ODM and
 executing queries as usual.</p>
+
+<h2 id="label-Optional+Modules">Optional Modules</h2>
+
+<p>Besides Queryable, there are three opt-in modules that can help you when
+creating query objects. These modules would need to be manually required
+during app initialization or wherever necessary (in Rails,
+config/initializers).</p>
+
+<h3 id="label-DefaultQuery">DefaultQuery</h3>
+
+<p>Provides default initialization for query objects, by attempting to infer
+the class name of the default collection for the query, and it also
+provides a <code>queryable</code> method to specify it.</p>
+
+<pre class="code ruby"><code class="ruby">require &#39;queryable/default_query&#39;
+
+def CustomersQuery
+  include Queryable
+  include Queryable::DefaultQuery
+end
+
+def OldCustomersQuery &lt; CustomersQuery
+  queryable ArchivedCustomers
+end
+
+CustomersQuery.new.queryable == Customer.all
+OldCustomersQuery.new.queryable == ArchivedCustomers.all
+</code></pre>
+
+<p>If you want to use common base objects for your queries, you may want want
+to delay the automatic inference: “`ruby class BaseQuery  include Queryable
+include Queryable::DefaultQuery</p>
+
+<p>queryable false end</p>
+
+<p>class CustomersQuery &lt; BaseQuery end</p>
+
+<p>CustomersQuery.new.queryable == Customer.all “`</p>
+
+<h3 id="label-DefaultScope">DefaultScope</h3>
+
+<p>Allows to define default scopes in query objects, and inherit them in query
+object subclasses.</p>
+
+<pre class="code ruby"><code class="ruby">require &#39;queryable/default_scope&#39;
+
+def CustomersQuery
+  include Queryable
+  include Queryable::DefaultScope
+  include Queryable::DefaultQuery
+
+  default_scope :active
+  scope :active, -&gt; { where(:last_purchase.gt =&gt; 7.days.ago) }
+end
+
+def BigCustomersQuery &lt; CustomersQuery
+  default_scope :big_spender
+  scope :big_spender, -&gt; { where(:total_expense.gt =&gt; 9999999) }
+end
+
+CustomersQuery.new.queryable == Customer.where(:last_purchase.gt =&gt; 7.days.ago)
+
+BigCustomersQuery.new.queryable ==
+Customer.where(:last_purchase.gt =&gt; 7.days.ago, :total_expense.gt =&gt; 9999999)
+</code></pre>
+
+<h3 id="label-Chainable+Methods">Chainable Methods</h3>
+
+<p>While scopes are great because of their terseness, they can be limiting
+because the block executes in the context of the internal query, so
+methods, constants, and variables of the Queryable are not accessible.</p>
+
+<p>For those cases, you can use a normal method, and then <code>chain</code>
+it. Chainable will take care of setting the return value of the method as
+the internal query, and return <code>self</code> at the end to make the
+method chainable.</p>
+
+<pre class="code ruby"><code class="ruby"><span class='kw'>class</span> <span class='const'>CustomersQuery</span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'>Queryable</span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'>Queryable</span><span class='op'>::</span><span class='const'>Chainable</span>
+
+  <span class='id identifier rubyid_chain'>chain</span> <span class='symbol'>:active</span><span class='comma'>,</span> <span class='symbol'>:recent</span>
+
+  <span class='kw'>def</span> <span class='id identifier rubyid_active'>active</span>
+    <span class='id identifier rubyid_where'>where</span><span class='lparen'>(</span><span class='label'>status:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>active</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='kw'>def</span> <span class='id identifier rubyid_recent'>recent</span>
+    <span class='id identifier rubyid_queryable'>queryable</span><span class='period'>.</span><span class='id identifier rubyid_desc'>desc</span><span class='lparen'>(</span><span class='symbol'>:logged_in_at</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_chain'>chain</span> <span class='kw'>def</span> <span class='id identifier rubyid_search'>search</span><span class='lparen'>(</span><span class='id identifier rubyid_field_values'>field_values</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_field_values'>field_values</span><span class='period'>.</span><span class='id identifier rubyid_inject'>inject</span><span class='lparen'>(</span><span class='id identifier rubyid_queryable'>queryable</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_query'>query</span><span class='comma'>,</span> <span class='lparen'>(</span><span class='id identifier rubyid_field'>field</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span><span class='op'>|</span>
+      <span class='id identifier rubyid_query'>query</span><span class='period'>.</span><span class='id identifier rubyid_where'>where</span><span class='lparen'>(</span><span class='id identifier rubyid_field'>field</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_value'>value</span><span class='embexpr_end'>}</span><span class='regexp_end'>/i</span></span><span class='rparen'>)</span>
+    <span class='rbrace'>}</span>
+  <span class='kw'>end</span>
+
+  <span class='kw'>def</span> <span class='id identifier rubyid_search_in_active'>search_in_active</span><span class='lparen'>(</span><span class='id identifier rubyid_field_values'>field_values</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_search'>search</span><span class='lparen'>(</span><span class='id identifier rubyid_field_values'>field_values</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_active'>active</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span>
+
+
+<span class='const'>CustomerQuery</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_shop'>shop</span><span class='period'>.</span><span class='id identifier rubyid_customers'>customers</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_miller_fans'>miller_fans</span><span class='period'>.</span><span class='id identifier rubyid_search_in_current'>search_in_current</span><span class='lparen'>(</span><span class='label'>last_name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>M</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+</code></pre>
+
+<h3 id="label-Notes">Notes</h3>
+
+<p>To avoid repetition, it&#39;s a good idea to create a
+<code>BaseQuery</code> object to contain both the modules inclusion, and
+common scopes you may reuse.</p>
+
+<pre class="code ruby"><code class="ruby">require &#39;queryable/chainable&#39;
+require &#39;queryable/default_scope&#39;
+require &#39;queryable/default_query&#39;
+
+def BaseQuery
+  include Queryable
+  include Queryable::Chainable
+  include Queryable::DefaultScope
+  include Queryable::DefaultQuery
+
+  # If you want to be concise:
+  include Queryable::DefaultQuery, Queryable::DefaultScope, Queryable::Chainable, Queryable
+
+  queryable false
+
+  scope :recent, -&gt;{ where(:created_at.gt =&gt; 1.week.ago) }
+end
+
+def CustomersQuery &lt; BaseQuery
+...
+end
+</code></pre>
 
 <h2 id="label-RDocs">RDocs</h2>
 
@@ -236,7 +303,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</code></pre>
 </div></div>
 
     <div id="footer">
-  Generated on Tue Aug 12 01:41:40 2014 by
+  Generated on Mon Oct 20 20:10:58 2014 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.7.4 (ruby-2.1.2).
 </div>
