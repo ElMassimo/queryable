@@ -25,7 +25,6 @@ module Queryable
       def chain(*names)
         prepend Module.new.tap { |m| Chainable.add_scope_methods(m, names) }
       end
-
     end
 
     private

@@ -38,7 +38,8 @@ module Queryable
 
     # Public: Delegates the specified methods to the internal query.
     def delegate(*methods)
-      methods.last.is_a?(Hash) ? super : def_delegators(:queryable, *methods)
+      to = methods.last.is_a?(Hash) && methods.pop[:to] || :queryable
+      def_delegators(to == :class ? 'self.class' : to, *methods)
     end
 
     # Public: Defines a new method that executes the passed proc or block in
