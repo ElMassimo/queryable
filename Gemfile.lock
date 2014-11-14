@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    queryable (3.0.0)
+    queryable (3.0.2)
 
 GEM
   remote: https://rubygems.org/

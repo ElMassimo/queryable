@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = "queryable"
-  s.version = '3.0.1'
+  s.version = '3.0.2'
   s.licenses = ['MIT']
   s.summary = "Keep your scopes and queries flexible by using Ruby"
   s.description = "Queryable is a module that encapsulates query building so you don't have to tuck scopes inside your models."

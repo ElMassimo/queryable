@@ -21,7 +21,7 @@ module Queryable
 
     # Internal: Adds class methods, and default initialization.
     def self.included(base)
-      base.include Chainable, DefaultQuery, DefaultScope, ::Queryable
+      base.send(:include, Chainable, DefaultQuery, DefaultScope, ::Queryable)
 
       base.delegate *DELEGATED_METHODS
       base.delegate_and_chain *CHAINABLE_METHODS
