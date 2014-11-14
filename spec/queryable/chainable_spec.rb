@@ -3,7 +3,7 @@ require './lib/queryable'
 require './lib/queryable/chainable'
 require 'support/chainable_queries'
 
-describe 'Queryable::Chainable' do
+describe Queryable::Chainable do
   Given(:query) { MockQuery.new([*allows]) }
   Given(:queryable) { OwnerQuery.new(query) }
 

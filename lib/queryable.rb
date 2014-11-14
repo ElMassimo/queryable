@@ -38,8 +38,21 @@ module Queryable
 
     # Public: Delegates the specified methods to the internal query.
     def delegate(*methods)
-      to = methods.last.is_a?(Hash) && methods.pop[:to] || :queryable
-      def_delegators(to == :class ? 'self.class' : to, *methods)
+      def_delegators extract_delegation_target(methods), *methods
+    end
+
+    # Public: Delegates the specified methods to the internal query, assigns the
+    # return value, and returns self.
+    def delegate_and_chain(*methods)
+      to = extract_delegation_target(methods)
+      class_eval methods.map { |name| Queryable.chained_method(name, to) }.join
+    end
+
+    # Internal: Extracts the :to option of the arguments, uses the internal
+    # query object as the target if no option is provided.
+    def extract_delegation_target(args)
+      to = args.last.is_a?(Hash) && args.pop[:to] || :queryable
+      to == :class ? 'self.class' : to
     end
 
     # Public: Defines a new method that executes the passed proc or block in
@@ -74,12 +87,23 @@ module Queryable
     end
   end
 
+  # Internal: Generates a method that delegates the call to the an internal
+  # object, assigns the return value, and returns self.
+  #
+  # Returns a String with the code of the method.
+  def self.chained_method(name, accessor)
+    <<-CHAIN
+      def #{name}(*args, &block)
+        @queryable = #{accessor}.__send__(:#{name}, *args, &block)
+        self
+      end
+    CHAIN
+  end
+
   # Internal: Default methods to be delegated to the internal query.
   #
   # Returns an Array with the name of the methods to delegate.
   def self.default_delegated_methods
-    Array.instance_methods - Object.instance_methods +
-    [:all, :where, :distinct, :group, :having, :includes, :joins, :limit, :offset, :order, :reverse_order] +
-    [:==, :as_json, :cache_key, :decorate]
+    Array.instance_methods - Object.instance_methods + [:all, :==, :as_json, :decorate]
   end
 end

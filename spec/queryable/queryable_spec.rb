@@ -38,4 +38,21 @@ describe Queryable do
     When(:uniq) { queryable.uniq }
     Then { uniq == [:so, :groovy, :man] }
   end
+
+  context 'when using delegating and chaining' do
+    Given(:criteria) { double('criteria') }
+    Given(:other_criteria) { double('criteria') }
+    Given(:queryable) { CustomerQuery.new(criteria) }
+
+    Given do
+      allow(criteria).to receive(:all).and_return(criteria)
+      expect(criteria).to receive(:awesome).with(:sandwiches, :bro).and_return(other_criteria)
+      expect(other_criteria).to receive(:great).with(:beer).and_return(criteria)
+      expect(criteria).to receive(:cool).and_return(other_criteria)
+    end
+
+    Then { queryable.awesome(:sandwiches, :bro) == queryable }
+    And  { queryable.great(:beer) == queryable }
+    And  { queryable.cool == queryable }
+  end
 end

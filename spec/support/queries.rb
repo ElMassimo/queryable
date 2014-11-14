@@ -7,6 +7,8 @@ class CustomerQuery
   scope :recent, -> { desc(:shopped_at) }
   scope(:shopped_after) {|date| gt(shopped_at: date) }
 
+  delegate_and_chain :awesome, :great, :cool
+
   def big_expenders_after(date)
     order_by_expense.recent.shopped_after(date)
   end
@@ -33,6 +35,8 @@ class OwnerQuery
 
   scope :success_over, ->(level) { gt(success: level) }
   scope :owners_of, ->(shops) {self.in(_id: shops.distinct(:owner_id)) }
+
+  delegate :order
 
   def initialize(query=Owner)
     super

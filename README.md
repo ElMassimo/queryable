@@ -44,8 +44,26 @@ CustomerQuery.new(shop.customers).miller_fans
 By default most Array methods are delegated to the internal query. It's possible
 to delegate extra methods to the query by calling `delegate`.
 ```ruby
-def CustomersQuery
-  delegate :update_all, :destroy_all
+class CustomersQuery
+  include Queryable
+
+  delegate :update_all, :destroy_all, :exists?
+end
+```
+
+### Delegate and Chain
+
+Sometimes you want to delegate a method to the internal query, but continue
+working with the query object like if you were calling scopes.
+
+You can achieve that using `delegate_and_chain`, which will delegate the method
+call, assign the return value as the internal query, and return the query object.
+
+```ruby
+class CustomersQuery
+  include Queryable
+
+  delegate_and_chain :where, :order_by
 end
 ```
 
@@ -55,7 +73,24 @@ end
 * You can inherit, mixin, and chain queries in a very natural way.
 * Increased testability, pretty close to being ORM/ODM agnostic.
 
-## Optional Modules
+## Basic Usage
+
+If you are using Mongoid or ActiveRecord, you might want to try the
+`Queryable::Mongoid` and `Queryable::ActiveRecord` modules that already take
+care of delegating and chaining most of the methods in the underlying queries.
+
+```ruby
+class CustomersQuery
+  include Queryable::Mongoid
+end
+
+CustomersQuery.new.where(:amount_purchased.gt => 2).active.asc(:logged_in_at)
+```
+
+This modules also include all the optional modules. If you would like to opt-out
+of the other modules you can follow the approach in the [Notes](https://github.com/ElMassimo/queryable#notes) section.
+
+## Advanced Usage
 There are three opt-in modules that can help you when creating query objects.
 These modules would need to be manually required during app initialization or
 wherever necessary (in Rails, config/initializers).
