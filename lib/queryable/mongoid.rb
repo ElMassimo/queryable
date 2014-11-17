@@ -1,6 +1,7 @@
 require 'queryable/chainable'
 require 'queryable/default_query'
 require 'queryable/default_scope'
+require 'queryable/all'
 
 # Public: Provides default configuration for query objects that decorate a
 # Mongoid::Criteria object, delegating the most used methods in Criteria.
@@ -21,10 +22,7 @@ module Queryable
 
     # Internal: Adds class methods, and default initialization.
     def self.included(base)
-      base.send(:include, Chainable, DefaultQuery, DefaultScope, ::Queryable)
-
-      base.delegate *DELEGATED_METHODS
-      base.delegate_and_chain *CHAINABLE_METHODS
+      All.included(base, DELEGATED_METHODS, CHAINABLE_METHODS)
     end
   end
 end
