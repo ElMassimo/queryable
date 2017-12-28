@@ -3,7 +3,7 @@ Queryable
 [![Gem Version](https://badge.fury.io/rb/queryable.svg)](http://badge.fury.io/rb/queryable)
 [![Build Status](https://travis-ci.org/ElMassimo/queryable.svg)](https://travis-ci.org/ElMassimo/queryable)
 [![Test Coverage](https://codeclimate.com/github/ElMassimo/queryable/badges/coverage.svg)](https://codeclimate.com/github/ElMassimo/queryable)
-[![Code Climate](https://codeclimate.com/github/ElMassimo/queryable.png)](https://codeclimate.com/github/ElMassimo/queryable)
+[![Code Climate](https://codeclimate.com/github/ElMassimo/queryable.svg)](https://codeclimate.com/github/ElMassimo/queryable)
 [![Inline docs](http://inch-ci.org/github/ElMassimo/queryable.svg)](http://inch-ci.org/github/ElMassimo/queryable)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/ElMassimo/queryable/blob/master/LICENSE.txt)
 <!-- [![Coverage Status](https://coveralls.io/repos/ElMassimo/queryable/badge.png)](https://coveralls.io/r/ElMassimo/queryable) -->
