@@ -4,9 +4,7 @@ Queryable
 [![Build Status](https://travis-ci.org/ElMassimo/queryable.svg)](https://travis-ci.org/ElMassimo/queryable)
 [![Test Coverage](https://codeclimate.com/github/ElMassimo/queryable/badges/coverage.svg)](https://codeclimate.com/github/ElMassimo/queryable)
 [![Code Climate](https://codeclimate.com/github/ElMassimo/queryable.svg)](https://codeclimate.com/github/ElMassimo/queryable)
-[![Inline docs](http://inch-ci.org/github/ElMassimo/queryable.svg)](http://inch-ci.org/github/ElMassimo/queryable)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/ElMassimo/queryable/blob/master/LICENSE.txt)
-<!-- [![Coverage Status](https://coveralls.io/repos/ElMassimo/queryable/badge.png)](https://coveralls.io/r/ElMassimo/queryable) -->
 
 Queryable is a mixin that allows you to easily define query objects with chainable scopes.
 
@@ -95,17 +93,17 @@ There are three opt-in modules that can help you when creating query objects.
 These modules would need to be manually required during app initialization or
 wherever necessary (in Rails, config/initializers).
 
-### DefaultQuery
+### Query Initialization 
+
 Provides default initialization for query objects, by attempting to infer the
 class name of the default collection for the query, and it also provides a
 `queryable` method to specify it.
 
 ```ruby
-require 'queryable/default_query'
+require 'queryable'
 
 def CustomersQuery
   include Queryable
-  include Queryable::DefaultQuery
 end
 
 def OldCustomersQuery < CustomersQuery
@@ -159,33 +157,26 @@ BigCustomersQuery.new.queryable ==
 Customer.where(:last_purchase.gt => 7.days.ago, :total_expense.gt => 9999999)
 ```
 
-### Chainable
+### Composition
 
 While scopes are great because of their terseness, they can be limiting because
 the block executes in the context of the internal query, so methods, constants,
 and variables of the Queryable are not accessible.
 
-For those cases, you can use a normal method, and then `chain` it. Chainable
-will take care of setting the return value of the method as the internal query,
-and return `self` at the end to make the method chainable.
+For those cases, it's preferable to use normal methods instead.
 
 ```ruby
-class CustomersQuery
-  include Queryable
-  include Queryable::Chainable
-
-  chain :active, :recent
-
+class CustomersQuery < BaseQuery
   def active
     where(status: 'active')
   end
 
   def recent
-    queryable.desc(:logged_in_at)
+    desc(:logged_in_at)
   end
 
-  chain def search(field_values)
-    field_values.inject(queryable) { |query, (field, value)|
+  def search(field_values)
+    field_values.inject(self) { |query, (field, value)|
       query.where(field => /#{value}/i)
     }
   end
@@ -200,22 +191,14 @@ CustomerQuery.new(shop.customers).miller_fans.search_in_current(last_name: 'M')
 ```
 
 ### Notes
+
 To avoid repetition, it's a good idea to create a `BaseQuery` object
 to contain both the modules inclusion, and common scopes you may reuse.
 
 ```ruby
-require 'queryable/chainable'
-require 'queryable/default_scope'
-require 'queryable/default_query'
 
 def BaseQuery
-  include Queryable
-  include Queryable::Chainable
-  include Queryable::DefaultScope
-  include Queryable::DefaultQuery
-
-  # If you want to be concise:
-  include Queryable::DefaultQuery, Queryable::DefaultScope, Queryable::Chainable, Queryable
+  include Queryable::ActiveRecord
 
   queryable false
 
@@ -232,34 +215,3 @@ end
 You can check the [specs](https://github.com/ElMassimo/queryable/tree/master/spec) of the project
 to check how to test query objects without even having to require the ORM/ODM, or
 you can test by requiring your ORM/ODM and executing queries as usual.
-
-## RDocs
-
-You can view the **Queryable** documentation in RDoc format here:
-
-http://rubydoc.info/github/ElMassimo/queryable/master/frames
-
-
-License
---------
-
-    Copyright (c) 2014 Máximo Mussini
-
-    Permission is hereby granted, free of charge, to any person obtaining
-    a copy of this software and associated documentation files (the
-    "Software"), to deal in the Software without restriction, including
-    without limitation the rights to use, copy, modify, merge, publish,
-    distribute, sublicense, and/or sell copies of the Software, and to
-    permit persons to whom the Software is furnished to do so, subject to
-    the following conditions:
-
-    The above copyright notice and this permission notice shall be
-    included in all copies or substantial portions of the Software.
-
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-    NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-    LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-    OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-    WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

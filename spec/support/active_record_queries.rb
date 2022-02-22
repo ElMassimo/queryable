@@ -9,8 +9,11 @@ end
 class CustomersQuery
   include Queryable::ActiveRecord
 
-  default_scope :big_spender
-
+  def initialize(query = nil)
+    super
+    @queryable = big_spender.queryable
+  end
+  
   def big_spender
     where(spends: 'a lot')
   end
@@ -20,5 +23,8 @@ class ShopsQuery < BaseQuery
 
   scope(:big_spender) { where(spends: 'a lot') }
 
-  default_scope :big_spender
+  def initialize(query = nil)
+    super
+    @queryable = big_spender.queryable
+  end
 end

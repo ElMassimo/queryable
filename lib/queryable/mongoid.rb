@@ -1,28 +1,66 @@
-require 'queryable/chainable'
-require 'queryable/default_query'
-require 'queryable/default_scope'
-require 'queryable/all'
+require 'queryable'
 
 # Public: Provides default configuration for query objects that decorate a
 # Mongoid::Criteria object, delegating the most used methods in Criteria.
 module Queryable
   module Mongoid
-
-    DELEGATED_METHODS = [
-      :avg, :max, :min, :sum, :exists?, :set, :pull, :push, :add_to_set,
-      :find_by, :build, :create, :destroy, :destroy_all, :update, :update_all,
-      :delete, :pluck, :distinct, :selector, :rename, :entries, :new, :explain
-    ]
-
-    CHAINABLE_METHODS = [
-      :where, :ne, :nin, :gt, :gte, :in, :lt, :lte, :between, :and, :or, :not,
-      :intersect, :override, :union, :exists, :elem_match, :with_size,
-      :none, :unscoped, :includes, :order_by, :asc, :desc, :skip, :limit
-    ]
-
     # Internal: Adds class methods, and default initialization.
     def self.included(base)
-      All.included(base, DELEGATED_METHODS, CHAINABLE_METHODS)
+      base.include(Queryable)
+      base.delegate *[
+        :add_to_set,
+        :avg,
+        :build,
+        :create,
+        :delete,
+        :destroy,
+        :destroy_all,
+        :distinct,
+        :entries,
+        :exists?,
+        :explain,
+        :find_by,
+        :max,
+        :min,
+        :new,
+        :pluck,
+        :pull,
+        :push,
+        :rename,
+        :selector,
+        :set,
+        :sum,
+        :update,
+        :update_all,
+      ]
+      base.delegate_and_chain *[
+        :and,
+        :asc,
+        :between,
+        :desc,
+        :elem_match,
+        :exists,
+        :gt,
+        :gte,
+        :in,
+        :includes,
+        :intersect,
+        :limit,
+        :lt,
+        :lte,
+        :ne,
+        :nin,
+        :none,
+        :not,
+        :or,
+        :order_by,
+        :override,
+        :skip,
+        :union,
+        :unscoped,
+        :where,
+        :with_size,
+      ]
     end
   end
 end
